@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>base-service</artifactId>
+        <groupId>com.ck.platform</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>id-generator-service</artifactId>
+    <packaging>pom</packaging>
+    <description>
+        ID生成器服务，可用于生成分布式ID，订单号，商户号等唯一的id。
+        注：订单号需实现按照一定的业务规则来生成，可按照指定的业务规则对订单分库分表，方便查询。
+    </description>
+    <modules>
+        <module>id-generator-service-facade</module>
+        <module>id-generator-service-impl</module>
+        <module>id-generator-service-deploy</module>
+        <module>id-generator-service-dao</module>
+    </modules>
+
+</project>
