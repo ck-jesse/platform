@@ -1,4 +1,4 @@
-package com.ck.platform.common.httpclient;
+package com.ck.platform.common.util.httpclient;
 
 /**
  * HTTP请求方式

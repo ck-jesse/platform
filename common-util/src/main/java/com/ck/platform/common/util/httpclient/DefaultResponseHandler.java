@@ -1,4 +1,4 @@
-package com.ck.platform.common.httpclient;
+package com.ck.platform.common.util.httpclient;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

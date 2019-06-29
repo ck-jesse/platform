@@ -12,10 +12,10 @@
     <description>通用工具包</description>
 
     <dependencies>
-        <!-- lombok -->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
+            <groupId>com.ck.platform</groupId>
+            <artifactId>common-dto</artifactId>
+            <version>${platform.common.dto.version}</version>
         </dependency>
 
         <!-- fastjson -->

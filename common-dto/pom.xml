@@ -3,20 +3,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>id-generator-service</artifactId>
+        <artifactId>platform-all</artifactId>
         <groupId>com.ck.platform</groupId>
         <version>1.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>id-generator-service-deploy</artifactId>
-    <name>id-generator-service-deploy</name>
+    <artifactId>common-dto</artifactId>
+    <name>common-dto</name>
+    <description>通用基础dto模块包，主要用于dubbo facade接口模块等</description>
 
     <dependencies>
+        <!-- lombok -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
-
     </dependencies>
+
 </project>

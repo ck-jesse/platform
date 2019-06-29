@@ -1,4 +1,4 @@
-package com.ck.platform.common.httpclient;
+package com.ck.platform.common.util.httpclient;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;

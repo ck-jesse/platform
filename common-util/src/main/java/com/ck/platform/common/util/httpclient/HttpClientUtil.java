@@ -1,4 +1,4 @@
-package com.ck.platform.common.httpclient;
+package com.ck.platform.common.util.httpclient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;

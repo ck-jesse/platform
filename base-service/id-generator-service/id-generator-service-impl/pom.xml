@@ -11,4 +11,12 @@
     <artifactId>id-generator-service-impl</artifactId>
     <name>id-generator-service-impl</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
 </project>

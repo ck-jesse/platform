@@ -15,4 +15,9 @@ public class DataResult<T> extends ServiceResult {
      * 返回业务数据
      */
     private T data;
+
+    public DataResult<T> setData(T data) {
+        this.data = data;
+        return this;
+    }
 }
