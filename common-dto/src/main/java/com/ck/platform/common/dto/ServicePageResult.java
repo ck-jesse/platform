@@ -1,5 +1,6 @@
 package com.ck.platform.common.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ public class ServicePageResult<T> extends ServiceResult {
     /**
      * 根据输入Dto初始化输出Dto
      */
+    @JSONField(serialize = false)
     public void init(ServicePageInput pageInput) {
         this.setLimit(pageInput.getLimit());
         this.setOffset(pageInput.getOffset());

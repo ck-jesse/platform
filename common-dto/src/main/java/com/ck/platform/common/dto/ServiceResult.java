@@ -1,6 +1,7 @@
 package com.ck.platform.common.dto;
 
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.ck.platform.common.exception.BizResultCode;
 import lombok.Data;
 
@@ -29,6 +30,10 @@ public class ServiceResult implements Serializable {
     public ServiceResult() {
     }
 
+    public ServiceResult(String retmsg) {
+        this.retmsg = retmsg;
+    }
+
     public ServiceResult(String retcode, String retmsg) {
         this.retcode = retcode;
         this.retmsg = retmsg;
@@ -37,6 +42,7 @@ public class ServiceResult implements Serializable {
     /**
      * 设置错误描述
      */
+    @JSONField(serialize = false)
     public ServiceResult error(String retmsg) {
         this.retcode = BizResultCode.ERR_SYSTEM.getCode();
         this.retmsg = retmsg;
@@ -46,6 +52,7 @@ public class ServiceResult implements Serializable {
     /**
      * 校验是否成功
      */
+    @JSONField(serialize = false)
     public boolean isSucc() {
         return BizResultCode.SUCC.getCode().equals(retcode);
     }
