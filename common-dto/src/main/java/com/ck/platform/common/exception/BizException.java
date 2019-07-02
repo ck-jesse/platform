@@ -6,12 +6,28 @@ package com.ck.platform.common.exception;
  * @author chenck
  * @date 2019/6/26 14:18
  */
-public class BizException extends RuntimeException {
+public class BizException extends RuntimeException implements ResultCode {
 
     /**
      * 结果码
      */
-    private ResultCode resultCode;
+    private String code;
+
+    /**
+     * 结果码信息
+     */
+    private String msg;
+
+    @Override
+    public String getCode() {
+        return code;
+    }
+
+    @Override
+    public String getMsg() {
+        return msg;
+    }
+
 
     /**
      * 构造函数
@@ -20,7 +36,8 @@ public class BizException extends RuntimeException {
      */
     public BizException(ResultCode resultCode) {
         super(resultCode.getMsg());
-        this.resultCode = new ResultCodeImpl(resultCode);
+        this.code = resultCode.getCode();
+        this.msg = resultCode.getMsg();
     }
 
     /**
@@ -31,7 +48,8 @@ public class BizException extends RuntimeException {
      */
     public BizException(ResultCode resultCode, Throwable cause) {
         super(cause);
-        this.resultCode = new ResultCodeImpl(resultCode);
+        this.code = resultCode.getCode();
+        this.msg = resultCode.getMsg();
     }
 
     /**
@@ -42,7 +60,8 @@ public class BizException extends RuntimeException {
      */
     public BizException(ResultCode resultCode, String detailMessage) {
         super(detailMessage);
-        this.resultCode = new ResultCodeImpl(resultCode);
+        this.code = resultCode.getCode();
+        this.msg = resultCode.getMsg();
     }
 
     /**
@@ -54,7 +73,8 @@ public class BizException extends RuntimeException {
      */
     public BizException(ResultCode resultCode, String detailMessage, Throwable cause) {
         super(detailMessage, cause);
-        this.resultCode = new ResultCodeImpl(resultCode);
+        this.code = resultCode.getCode();
+        this.msg = resultCode.getMsg();
     }
 
     /**
@@ -64,7 +84,9 @@ public class BizException extends RuntimeException {
      * @param msg
      */
     public BizException(String code, String msg) {
-        this(new ResultCodeImpl(code, msg));
+        super(msg);
+        this.code = code;
+        this.msg = msg;
     }
 
     /**
@@ -75,7 +97,9 @@ public class BizException extends RuntimeException {
      * @param cause
      */
     public BizException(String code, String msg, Throwable cause) {
-        this(new ResultCodeImpl(code, msg), cause);
+        super(cause);
+        this.code = code;
+        this.msg = msg;
     }
 
     /**
@@ -86,50 +110,23 @@ public class BizException extends RuntimeException {
      * @param detailMessage
      */
     public BizException(String code, String msg, String detailMessage) {
-        this(new ResultCodeImpl(code, msg), detailMessage);
+        super(detailMessage);
+        this.code = code;
+        this.msg = msg;
     }
 
     /**
-     * Getter method for property <tt>resultCode</tt>.
+     * 构造函数
      *
-     * @return property value of resultCode
+     * @param code
+     * @param msg
+     * @param detailMessage
+     * @param cause
      */
-    public ResultCode getResultCode() {
-        return resultCode;
-    }
-
-    public static class ResultCodeImpl implements ResultCode {
-
-        private String code;
-
-        private String msg;
-
-        public ResultCodeImpl(ResultCode resultCode) {
-            this.code = resultCode.getCode();
-            this.msg = resultCode.getMsg();
-        }
-
-        public ResultCodeImpl(String code, String msg) {
-            this.code = code;
-            this.msg = msg;
-        }
-
-        /**
-         * @see ResultCode#getCode()
-         */
-        @Override
-        public String getCode() {
-            return code;
-        }
-
-        /**
-         * @see ResultCode#getMsg()
-         */
-        @Override
-        public String getMsg() {
-            return msg;
-        }
-
+    public BizException(String code, String msg, String detailMessage, Throwable cause) {
+        super(detailMessage, cause);
+        this.code = code;
+        this.msg = msg;
     }
 
 }
