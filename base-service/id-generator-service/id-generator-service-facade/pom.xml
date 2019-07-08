@@ -11,4 +11,12 @@
     <artifactId>id-generator-service-facade</artifactId>
     <name>id-generator-service-facade</name>
 
+    <dependencies>
+
+        <dependency>
+            <groupId>com.ck.platform</groupId>
+            <artifactId>common-dto</artifactId>
+        </dependency>
+
+    </dependencies>
 </project>

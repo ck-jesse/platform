@@ -1,0 +1,59 @@
+server:
+    port: 9001
+    servlet:
+      context-path: /id-generator-service
+    error:
+        whitelabel:
+            enabled: false
+
+spring:
+    jackson:
+        date-format: yyyy-MM-dd HH:mm:ss
+    http:
+        encoding:
+            enabled: false
+    redis:
+      # 单机模式
+      host: 127.0.0.1
+      port: 6379
+      # 普通集群模式
+      #cluster:
+      #  nodes: 127.0.0.1:6379,127.0.0.1:6378
+
+# dubbo 服务提供方配置
+# 基于Apache Dubbo的 dubbo-spring-boot-starter 的配置
+dubbo:
+    application:
+        name: id-generator-service
+        qosEnable: true
+        qosPort: 22201
+        qosAcceptForeignIp: false
+    provider:
+      # 服务端执行超时全局控制
+      timeout: 6000
+    consumer:
+        check: false
+    registry:
+        address: zookeeper://127.0.0.1:2181
+    protocol:
+        name: dubbo
+        port: 20801
+    scan:
+        base-packages: com.ck.platform.id.generator.facade.impl
+    # 元数据中心(报送配置)
+    metadata-report:
+        address: zookeeper://127.0.0.1:2181
+        # dubbo-admin2.7中默认配置group=dubbo，所以此处必须配置group，否则控制台会报错：“无元数据信息，请升级至Dubbo2.7及以上版本”
+        # 验证发现：只要第一次配置了group=dubbo，正常查看元数据后，后续去掉此处的group配置，控制台中也可以查看到元数据（不知道是什么机制，做了兼容吗？）
+        group: dubbo
+
+
+# mybatis-spring-boot-starter 配置
+# 默认通过AutoConfigurationPackages获取basePackages，因spring-boot启动类的存放目录不同，可能导致获取到的basePackages中不包含mapper接口目录，此时可@MapperScan来设置mapper接口扫描目录
+#mybatis:
+#  mapper-locations: classpath:mybatis/*.xml
+
+# 日志追踪trace_id前缀
+log:
+  trace_id:
+    prefix: IDGEN_
