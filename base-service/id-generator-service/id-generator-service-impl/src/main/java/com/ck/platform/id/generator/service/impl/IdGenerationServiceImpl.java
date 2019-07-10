@@ -35,6 +35,7 @@ public class IdGenerationServiceImpl implements IdGenerationService, Initializin
     @Override
     public void afterPropertiesSet() {
         // init mac id
+
         String localIpAddress = NetUtils.getLocalAddress().getHostAddress();
         if (localIpAddress.equals("127.0.0.1") || localIpAddress.equals("localhost")) {
             throw new RuntimeException("snowflake can not use localhost as it's mac identity,init fail! ");

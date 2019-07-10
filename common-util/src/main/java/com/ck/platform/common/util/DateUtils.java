@@ -15,12 +15,16 @@ import java.util.Date;
 public class DateUtils {
 
     // 默认的时间格式
-    public static final String DEFUALT_SHOT_TIME_FORMAT = "yyyy-MM-dd";
-    public static final String SHOT_DATE_FORMAT = "yyyyMMdd";
-    public static final String DEFUALT_LONG_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final String LONG_TIME_FORMAT = "HH:mm:ss";
-    public static final String SHOT_TIME_FORMAT = "HHmmss";
-    public static final String DATE_FORMAT = "yyyyMMddHHmmss";
+    public static final String YYYY_MM_DD = "yyyy-MM-dd";
+    public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    public static final String YYYY_MM_DD_HH_MM_SS_SSS = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String YYYYMMDD = "yyyyMMdd";
+    public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
+    public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
+    public static final String YYMMDDHHMMSS = "yyMMddHHmmss";
+    public static final String YYMMDDHHMMSSSSS = "yyMMddHHmmssSSS";
+    public static final String HH_MM_SS = "HH:mm:ss";
+    public static final String HHMMSS = "HHmmss";
 
     private DateUtils() {
 
@@ -121,7 +125,7 @@ public class DateUtils {
      */
     public static String getCurrentDateToString(String dateFormat) {
         if (StringUtils.isBlank(dateFormat)) {
-            dateFormat = DEFUALT_SHOT_TIME_FORMAT;
+            dateFormat = YYYY_MM_DD;
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
@@ -141,9 +145,9 @@ public class DateUtils {
 
         if (StringUtils.isBlank(dateFormat)) {
             if (date.length() > 10) {
-                dateFormat = DEFUALT_LONG_TIME_FORMAT;
+                dateFormat = YYYY_MM_DD_HH_MM_SS;
             } else {
-                dateFormat = DEFUALT_SHOT_TIME_FORMAT;
+                dateFormat = YYYY_MM_DD;
             }
         }
 
@@ -168,7 +172,7 @@ public class DateUtils {
         }
 
         if (StringUtils.isBlank(dateFormat)) {
-            dateFormat = DEFUALT_SHOT_TIME_FORMAT;
+            dateFormat = YYYY_MM_DD;
         }
 
         try {
@@ -194,7 +198,7 @@ public class DateUtils {
      * @return
      */
     public static String getCurrentDateYYYYMMDD() {
-        return dateToStr(getCurrentDate(), SHOT_DATE_FORMAT);
+        return dateToStr(getCurrentDate(), YYYYMMDD);
     }
 
     /**
@@ -203,7 +207,7 @@ public class DateUtils {
      * @return
      */
     public static String getCurrentDateYYYYMMDDHHMMSS() {
-        return dateToStr(getCurrentDate(), DATE_FORMAT);
+        return dateToStr(getCurrentDate(), YYYYMMDDHHMMSS);
     }
 
     /**
@@ -265,7 +269,7 @@ public class DateUtils {
      */
     public static String addDate(String s, int n) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(SHOT_DATE_FORMAT);
+            SimpleDateFormat sdf = new SimpleDateFormat(YYYYMMDD);
 
             Calendar cd = Calendar.getInstance();
             cd.setTime(sdf.parse(s));
@@ -309,7 +313,7 @@ public class DateUtils {
      * @return
      */
     public static Date addDay(String srcDate, int days) {
-        Date date = DateUtils.strToDate(srcDate, DateUtils.SHOT_DATE_FORMAT);
+        Date date = DateUtils.strToDate(srcDate, DateUtils.YYYYMMDD);
         return DateUtils.addDate(date, days, 0, 0);
     }
 
@@ -347,20 +351,20 @@ public class DateUtils {
         System.out.println(DateUtils.strToDate("20131121100521", "yyyyMMddHHmmss"));
 
         Date srcDate = new Date();
-        System.out.println(DateUtils.dateToStr(srcDate, DEFUALT_LONG_TIME_FORMAT));
-        System.out.println(DateUtils.dateToStr(DateUtils.addDate(srcDate, 1, 0, 0), DEFUALT_LONG_TIME_FORMAT));
-        System.out.println(DateUtils.dateToStr(DateUtils.addDate(srcDate, 1, 1, 0), DEFUALT_LONG_TIME_FORMAT));
-        System.out.println(DateUtils.dateToStr(DateUtils.addDate(srcDate, 1, 1, 1), DEFUALT_LONG_TIME_FORMAT));
-        System.out.println(DateUtils.dateToStr(srcDate, DEFUALT_LONG_TIME_FORMAT));
-        System.out.println(DateUtils.dateToStr(DateUtils.addDate(srcDate, 0, 1440, 0), DEFUALT_LONG_TIME_FORMAT));
+        System.out.println(DateUtils.dateToStr(srcDate, YYYY_MM_DD_HH_MM_SS));
+        System.out.println(DateUtils.dateToStr(DateUtils.addDate(srcDate, 1, 0, 0), YYYY_MM_DD_HH_MM_SS));
+        System.out.println(DateUtils.dateToStr(DateUtils.addDate(srcDate, 1, 1, 0), YYYY_MM_DD_HH_MM_SS));
+        System.out.println(DateUtils.dateToStr(DateUtils.addDate(srcDate, 1, 1, 1), YYYY_MM_DD_HH_MM_SS));
+        System.out.println(DateUtils.dateToStr(srcDate, YYYY_MM_DD_HH_MM_SS));
+        System.out.println(DateUtils.dateToStr(DateUtils.addDate(srcDate, 0, 1440, 0), YYYY_MM_DD_HH_MM_SS));
 
         System.out.println(DateUtils.dateToStr(DateUtils.addDate(DateUtils.strToDate("20131016", "yyyyMMdd"), -5, 0, 0),
-                DEFUALT_LONG_TIME_FORMAT));
+                YYYY_MM_DD_HH_MM_SS));
 
         System.out.println(DateUtils.getDayByDate("20150930"));
 
         Date date = DateUtils.addDay("20150930", 1);
-        String sendDate = DateUtils.dateToStr(date, DateUtils.SHOT_DATE_FORMAT);
+        String sendDate = DateUtils.dateToStr(date, DateUtils.YYYYMMDD);
         System.out.println(sendDate);
 
         Date nowDate = new Date();
