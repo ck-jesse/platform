@@ -47,7 +47,7 @@ public class IdGenerationFacadeImpl implements IdGenerationFacade {
     IdGenerationService idGenerationService;
 
     @Override
-    public Long genUniqueId() {
+    public Long generateId() {
         return idGenerationService.generateId();
     }
 
@@ -56,6 +56,7 @@ public class IdGenerationFacadeImpl implements IdGenerationFacade {
         Long channelId = redisTemplate.opsForValue().increment(RedisKeys.CHANNEL_ID_INCR, 1);
         // 生成渠道id，长度为8位（千万级）
         // 1开头用来标志渠道
+        // 渠道号范围 10000000-19999999
         channelId = 10000000 + channelId % 10000000;
         return String.valueOf(channelId);
     }
@@ -72,19 +73,12 @@ public class IdGenerationFacadeImpl implements IdGenerationFacade {
 
     @Override
     public String genMchId(String stuffix, Boolean appendStuffix) {
-        // 生成redis key
-        String key = RedisKeys.MCH_ID_INCR;
-        if (StringUtils.isNotBlank(stuffix)) {
-            stuffix = stuffix.trim();
-            if (stuffix.length() > 3) {
-                throw new BizException(BizResultCode.ERR_PARAM, "生成商户号时指定的后缀长度不能超过" + 3);
-            }
-            // 当stuffix不为空时，则可将stuffix看作是一个命名空间，也就是每一个stuffix下都可生成20000000-29999999的商户号
-            key = key + "." + stuffix;
-        }
-        Long mchId = redisTemplate.opsForValue().increment(key, 1);
+        // 生成id
+        Long mchId = genId(RedisKeys.MCH_ID_INCR, stuffix, 3);
+
         // 生成商户id，长度为8位（千万级）
         // 2开头用来标志商户
+        // 商户号范围 20000000-29999999
         mchId = 20000000 + mchId % 10000000;
 
         String mchIdStr = String.valueOf(mchId);
@@ -93,6 +87,53 @@ public class IdGenerationFacadeImpl implements IdGenerationFacade {
             return mchIdStr + stuffix;
         }
         return mchIdStr;
+    }
+
+    /**
+     * 基于redis increment 生成分布式全局唯一id
+     *
+     * @param key
+     * @param stuffix
+     * @param stuffixMaxLen
+     * @return java.lang.Long
+     * @author chenck
+     * @date 2019/7/11 11:42
+     */
+    private Long genId(String key, String stuffix, int stuffixMaxLen) {
+        // 生成redis key
+        if (StringUtils.isNotBlank(stuffix)) {
+            stuffix = stuffix.trim();
+            if (stuffix.length() > stuffixMaxLen) {
+                throw new BizException(BizResultCode.ERR_PARAM, "生成id的后缀长度不能超过" + stuffixMaxLen);
+            }
+            // 当stuffix不为空时，则可将stuffix看作是一个命名空间
+            key = key + ":" + stuffix;
+        }
+        Long id = redisTemplate.opsForValue().increment(key, 1);
+        return id;
+    }
+
+    @Override
+    public String genUid() {
+        return genUid(null);
+    }
+
+    @Override
+    public String genUid(String stuffix) {
+        // 生成id
+        Long uid = genId(RedisKeys.UID_INCR, stuffix, 3);
+
+        // 生成用户id，长度为9位（亿级）
+        // 3开头用来标志用户
+        // 用户id范围 300000000-399999999
+        uid = 300000000 + uid % 100000000;
+
+        String uidStr = String.valueOf(uid);
+        if (StringUtils.isNotBlank(stuffix)) {
+            // 给用户id拼接指定后缀，拼接后长度为9到12位
+            return uidStr + stuffix;
+        }
+        return uidStr;
     }
 
     @Override

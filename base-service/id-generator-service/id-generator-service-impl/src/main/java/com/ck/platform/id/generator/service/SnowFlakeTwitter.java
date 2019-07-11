@@ -16,6 +16,13 @@ public class SnowFlakeTwitter {
     // private final static long START_STMP = 1546272000000L;// 2019-01-01
     // private final static long START_STMP = 1514736000000L;// 2018-01-01
     private final static long START_STMP = 1483200000000L;// 2017-01-01
+    //private final static long START_STMP = 1420041600000L;// 2015-01-01
+    //private final static long START_STMP = 1262275200000L;// 2010-01-01
+    //private final static long START_STMP = 1388505600000L;// 2014-01-01
+    //private final static long START_STMP = 1356969600000L;// 2013-01-01
+    //private final static long START_STMP = 1325347200000L;// 2012-01-01 18位
+    //private final static long START_STMP = 1293811200000L;// 2011-01-01 19位
+    //private final static long START_STMP = 946656000000L;// 2000-01-01
 
     /**
      * 每一部分占用的位数
@@ -108,12 +115,15 @@ public class SnowFlakeTwitter {
         // 初始时间计算
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println(sdf.format(START_STMP));
-        System.out.println(sdf.parse("1990-01-01 00:00:00").getTime());
+        System.out.println(sdf.parse("2014-01-01 00:00:00").getTime());
+        System.out.println(sdf.parse("2013-01-01 00:00:00").getTime());
+        System.out.println(sdf.parse("2012-01-01 00:00:00").getTime());
+        System.out.println(sdf.parse("2011-01-01 00:00:00").getTime());
 
 
         long startTime = System.currentTimeMillis();
         SnowFlakeTwitter snowFlake = new SnowFlakeTwitter(0, 1);
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             long id = snowFlake.nextId();
             String timeStr = Long.toBinaryString(id);
             System.out.println(id + " " + timeStr.length() + " " + timeStr);

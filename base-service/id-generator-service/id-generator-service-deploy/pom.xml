@@ -65,7 +65,7 @@
                     <archive>
                         <manifest>
                             <!-- 项目启动类 -->
-                            <mainClass>com.ck.platform.id.generator.IdGenerationApp</mainClass>
+                            <mainClass>com.ck.platform.id.generator.IdGenerationBootstrap</mainClass>
                             <!-- 依赖的jar的目录前缀 -->
                             <classpathPrefix>../lib</classpathPrefix>
                             <addClasspath>true</addClasspath>

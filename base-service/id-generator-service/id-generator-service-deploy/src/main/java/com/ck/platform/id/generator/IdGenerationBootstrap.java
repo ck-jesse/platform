@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 //@EnableCaching
 @EnableLogAccess
-public class IdGenerationApp {
+public class IdGenerationBootstrap {
 
     /**
      * 定义该方法的目的是为了方便进行http访问测试
@@ -32,7 +32,7 @@ public class IdGenerationApp {
         System.setProperty("jute.maxbuffer", 8192 * 1024 + "");
         // 解决启动时报错：No such any registry to refer service in consumer 10.1.6.48 use dubbo version 2.6.4
         System.setProperty("java.net.preferIPv4Stack", "true");
-        SpringApplication.run(IdGenerationApp.class, args);
+        SpringApplication.run(IdGenerationBootstrap.class, args);
     }
 
 }
