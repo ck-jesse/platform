@@ -54,6 +54,15 @@ public @interface HttpApiAnno {
     String DATA_FORMAT_KV = "KV";
 
     /**
+     * POST请求的数据提交方式，表单形式提交
+     */
+    String POST_DATA_MODE_FORM = "FORM";
+    /**
+     * POST请求的数据提交方式，流的形式提交
+     */
+    String POST_DATA_MODE_STREAM = "STREAM";
+
+    /**
      * 接口名称
      */
     String name() default "";
@@ -95,7 +104,8 @@ public @interface HttpApiAnno {
 
     /**
      * URL上参数的构建模式，包含格式化模式 (FORMAT)、拼接模式(JOIN)<br>
-     * 注意：FORMAT模式下，会将url参数根据TreeMap本身特性按照key升序排列,然后格式化到url上<br>
+     * 注：FORMAT模式下，会将url参数根据TreeMap本身特性按照key升序排列,然后格式化到url上<br>
+     * 注：GET请求参数是附加在url上的
      */
     String urlParamBuildMode() default URL_PARAM_JOIN_MODE;
 
@@ -106,9 +116,17 @@ public @interface HttpApiAnno {
     String dataFrom() default DATA_FROM_OBJECT_SELF;
 
     /**
-     * 数据格式,默认JSON<br>
-     * 目前含三种：JSON、XML、KV格式<br>
-     * 暂时未使用<br>
+     * 数据提交方式（适用于POST请求）
+     * <p>
+     * FORM 表单形式提交（默认），STREAM 流的形式提交
      */
-    String dataFormat() default DATA_FORMAT_JSON;
+    String postDataMode() default POST_DATA_MODE_FORM;
+
+    /**
+     * 数据格式（适用于POST请求）
+     * <p>
+     * 支持 JSON（默认）、XML、KV格式
+     * 注：以流的形式提交才会使用到该字段
+     */
+    String postDataFormat() default DATA_FORMAT_JSON;
 }

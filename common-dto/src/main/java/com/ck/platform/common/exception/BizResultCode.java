@@ -12,10 +12,11 @@ public enum BizResultCode implements ResultCode {
     SUCC("0", "ok"),
     ERR_SYSTEM("10001", "系统错误"),
     ERR_PARAM("10002", "参数错误"),
-    ERR_DATE_FORMAT("10003", "时间格式错误"),
-    ERR_SIGN("10004", "签名错误"),
-    ERR_HTTP_TIMEOUT("10005", "HTTP请求超时"),
-    ERR_INVALID_HTTP_RESP("10006", "无效的HTTP响应"),;
+    ERR_CONFIG("10003", "配置错误"),
+    ERR_DATE_FORMAT("10004", "时间格式错误"),
+    ERR_SIGN("10005", "签名错误"),
+    ERR_HTTP_TIMEOUT("10006", "HTTP请求超时"),
+    ERR_INVALID_HTTP_RESP("10007", "无效的HTTP响应"),;
 
     /**
      * 初始化保存到map里方便根据code获取
