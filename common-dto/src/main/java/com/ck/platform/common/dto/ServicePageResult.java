@@ -1,6 +1,7 @@
 package com.ck.platform.common.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.ck.platform.common.exception.BizResultCode;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -56,4 +57,42 @@ public class ServicePageResult<T> extends ServiceResult {
         this.setOffset(pageInput.getOffset());
     }
 
+    /**
+     * 设置结果
+     */
+    public static <T> ServicePageResult<T> result(List<T> dataList, String code, String msg) {
+        ServicePageResult dataResult = new ServicePageResult(code, msg);
+        dataResult.setDataList(dataList);
+        return dataResult;
+    }
+
+    /**
+     * 设置为成功
+     */
+    public static ServicePageResult succ() {
+        return ServicePageResult.result(null, BizResultCode.SUCC.getCode(), BizResultCode.SUCC.getMsg());
+    }
+
+    public static ServicePageResult succ(String msg) {
+        return ServicePageResult.result(null, BizResultCode.SUCC.getCode(), msg);
+    }
+
+    public static <T> ServicePageResult<T> succ(List<T> dataList) {
+        return ServicePageResult.result(dataList, BizResultCode.SUCC.getCode(), BizResultCode.SUCC.getMsg());
+    }
+
+    /**
+     * 设置为失败
+     */
+    public static ServicePageResult error() {
+        return ServicePageResult.result(null, BizResultCode.ERR_SYSTEM.getCode(), BizResultCode.ERR_SYSTEM.getMsg());
+    }
+
+    public static ServicePageResult error(String msg) {
+        return ServicePageResult.result(null, BizResultCode.ERR_SYSTEM.getCode(), msg);
+    }
+
+    public static <T> ServicePageResult<T> error(List<T> dataList) {
+        return ServicePageResult.result(dataList, BizResultCode.ERR_SYSTEM.getCode(), BizResultCode.ERR_SYSTEM.getMsg());
+    }
 }

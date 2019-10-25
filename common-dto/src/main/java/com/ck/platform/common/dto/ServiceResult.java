@@ -40,20 +40,41 @@ public class ServiceResult implements Serializable {
     }
 
     /**
-     * 设置错误描述
-     */
-    @JSONField(serialize = false)
-    public ServiceResult error(String retmsg) {
-        this.retcode = BizResultCode.ERR_SYSTEM.getCode();
-        this.retmsg = retmsg;
-        return this;
-    }
-
-    /**
      * 校验是否成功
      */
     @JSONField(serialize = false)
     public boolean isSucc() {
         return BizResultCode.SUCC.getCode().equals(retcode);
     }
+
+    /**
+     * 设置结果
+     */
+    public static ServiceResult result(String code, String msg) {
+        ServiceResult ServiceResult = new ServiceResult(code, msg);
+        return ServiceResult;
+    }
+
+    /**
+     * 设置为成功
+     */
+    public static ServiceResult succ() {
+        return ServiceResult.result(BizResultCode.SUCC.getCode(), BizResultCode.SUCC.getMsg());
+    }
+
+    public static ServiceResult succ(String msg) {
+        return ServiceResult.result(BizResultCode.SUCC.getCode(), msg);
+    }
+
+    /**
+     * 设置为失败
+     */
+    public static ServiceResult error() {
+        return ServiceResult.result(BizResultCode.ERR_SYSTEM.getCode(), BizResultCode.ERR_SYSTEM.getMsg());
+    }
+
+    public static ServiceResult error(String msg) {
+        return ServiceResult.result(BizResultCode.ERR_SYSTEM.getCode(), msg);
+    }
+
 }
