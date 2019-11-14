@@ -1,14 +1,15 @@
 package com.ck.platform.common.util;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 系统时钟
+ * 后台定时更新系统时钟
  * <p>
- * 问题：单线程执行 System.currentTimeMillis()，比多线程并发执行 System.currentTimeMillis() 快了许多倍。
+ * 问题：System.currentTimeMillis() 在并发调用或者特别频繁调用它的情况下性能很差
  * <p>
  * 1、为什么并发执行时这么慢呢？
  * HotSpot源码的hotspot/src/os/linux/vm/os_linux.cpp文件中，有一个javaTimeMillis()方法，这就是System.currentTimeMillis()的native实现。
@@ -23,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2019/11/14 11:14
  */
 public class SystemClock {
-    private static final SystemClock MILLIS_CLOCK = new SystemClock(1);
+
     private final long precision;
     private final AtomicLong now;
 
@@ -33,21 +34,98 @@ public class SystemClock {
         scheduleClockUpdating();
     }
 
-    public static SystemClock millisClock() {
-        return MILLIS_CLOCK;
-    }
-
+    /**
+     * 定时更新当前毫秒时间戳
+     */
     private void scheduleClockUpdating() {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
-            Thread thread = new Thread(runnable, "system.clock");
+            Thread thread = new Thread(runnable, "system_clock");
             thread.setDaemon(true);
             return thread;
         });
         scheduler.scheduleAtFixedRate(() -> now.set(System.currentTimeMillis()), precision, precision, TimeUnit.MILLISECONDS);
     }
 
-    public long now() {
+    public long precision() {
+        return precision;
+    }
+
+    /**
+     * 当前时间戳(ms)
+     */
+    private long currentTimeMillis() {
         return now.get();
     }
 
+    /**
+     * 当前时间戳(ms)
+     */
+    public static long now() {
+        return instance().currentTimeMillis();
+    }
+
+    /**
+     * 获取实例
+     */
+    private static SystemClock instance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+    /**
+     * 静态内部类，实现延迟加载单利模式
+     */
+    private static class InstanceHolder {
+        public static final SystemClock INSTANCE = new SystemClock(1L);
+
+        private InstanceHolder() {
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        int times = Integer.MAX_VALUE;
+
+        // 单线程-定时更新时间戳并缓存
+        //
+        long start = System.currentTimeMillis();
+        for (long i = 0; i < times; i++) {
+            SystemClock.now();
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("SystemClock.now() => times = " + times + ", time = " + (end - start) + "ms");
+
+        // 单线程-普通使用System.currentTimeMillis()
+        // 效率很差
+        long start2 = System.currentTimeMillis();
+        for (long i = 0; i < times; i++) {
+            System.currentTimeMillis();
+        }
+        long end2 = System.currentTimeMillis();
+        System.out.println("System.currentTimeMillis() => times = " + times + ", time = " + (end2 - start2) + "ms");
+
+        // 多线程--普通使用System.currentTimeMillis()
+        // 效率很差
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch endLatch = new CountDownLatch(1000);
+        for (long i = 0; i < 1000; i++) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        startLatch.await();
+                        System.currentTimeMillis();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
+                        endLatch.countDown();
+                    }
+                }
+            }).start();
+        }
+        long beginTime = System.currentTimeMillis();
+        startLatch.countDown();
+        endLatch.await();
+        long elapsedTime = System.currentTimeMillis() - beginTime;
+        System.out.println("100 System.currentTimeMillis() parallel calls: " + elapsedTime + " ms");
+
+    }
 }
