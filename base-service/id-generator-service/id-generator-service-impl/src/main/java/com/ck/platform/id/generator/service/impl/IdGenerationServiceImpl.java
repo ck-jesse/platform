@@ -40,6 +40,7 @@ public class IdGenerationServiceImpl implements IdGenerationService, Initializin
         if (localIpAddress.equals("127.0.0.1") || localIpAddress.equals("localhost")) {
             throw new RuntimeException("snowflake can not use localhost as it's mac identity,init fail! ");
         }
+        localIpAddress = "192.168.56.2";
 
         // 基于redis实现机器id中心化
         String macIdRdsKey = RedisKeys.SNOWFLAKE_MAC_ID + localIpAddress;
@@ -49,10 +50,10 @@ public class IdGenerationServiceImpl implements IdGenerationService, Initializin
             if (macId >= SnowFlakeTwitter.MAX_MACHINE_NUM) {
                 throw new RuntimeException("snowflake mac larger than " + SnowFlake.MAX_MACHINE_NUM + " ,mac id exhausted! init fail!");
             }
-            LOGGER.info("ID生成器启动初始化：生成macId={}", macId);
+            LOGGER.info("ID生成器启动初始化：生成 {} = {}", macIdRdsKey, macId);
             redisTemplate.opsForValue().set(macIdRdsKey, macId);
         } else {
-            LOGGER.info("ID生成器启动初始化：已有macId={}", macId);
+            LOGGER.info("ID生成器启动初始化：已有 {} = {}", macIdRdsKey, macId);
         }
 
         // 初始化ID生成器
