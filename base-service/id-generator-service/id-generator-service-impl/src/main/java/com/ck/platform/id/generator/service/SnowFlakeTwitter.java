@@ -119,7 +119,7 @@ public class SnowFlakeTwitter {
         System.out.println(sdf.parse("2013-01-01 00:00:00").getTime());
         System.out.println(sdf.parse("2012-01-01 00:00:00").getTime());
         System.out.println(sdf.parse("2011-01-01 00:00:00").getTime());
-
+        System.out.println("MAX_MACHINE_NUM = "+SnowFlakeTwitter.MAX_MACHINE_NUM);
 
         long startTime = System.currentTimeMillis();
         SnowFlakeTwitter snowFlake = new SnowFlakeTwitter(0, 1);

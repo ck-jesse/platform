@@ -28,25 +28,23 @@ public class IdGenerationServiceImpl implements IdGenerationService, Initializin
     private static final long DEFAULT_DATA_CENTER_ID = 1;
 
     @Resource
-    private RedisTemplate<String, Integer> redisTemplate;
+    private RedisTemplate<String, Long> redisTemplate;
 
     private SnowFlakeTwitter snowFlake;
 
     @Override
     public void afterPropertiesSet() {
         // init mac id
-
         String localIpAddress = NetUtils.getLocalAddress().getHostAddress();
         if (localIpAddress.equals("127.0.0.1") || localIpAddress.equals("localhost")) {
             throw new RuntimeException("snowflake can not use localhost as it's mac identity,init fail! ");
         }
-        localIpAddress = "192.168.56.2";
 
         // 基于redis实现机器id中心化
         String macIdRdsKey = RedisKeys.SNOWFLAKE_MAC_ID + localIpAddress;
-        Integer macId = redisTemplate.opsForValue().get(macIdRdsKey);
+        Long macId = redisTemplate.opsForValue().get(macIdRdsKey);
         if (macId == null) {
-            macId = Math.toIntExact(redisTemplate.opsForValue().increment(RedisKeys.SNOWFLAKE_MAC_ID_INCR, 1));
+            macId = redisTemplate.opsForValue().increment(RedisKeys.SNOWFLAKE_MAC_ID_INCR, 1);
             if (macId >= SnowFlakeTwitter.MAX_MACHINE_NUM) {
                 throw new RuntimeException("snowflake mac larger than " + SnowFlake.MAX_MACHINE_NUM + " ,mac id exhausted! init fail!");
             }
