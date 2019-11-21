@@ -1,5 +1,7 @@
 package com.ck.platform.common.util;
 
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -176,19 +178,33 @@ public class CardNoUtil {
      * @param prefix 前缀
      */
     public static String genCouponSn(String prefix) {
-        return genSerialNumWithCheckSum(prefix.substring(0, 5) + "1" + prefix.substring(5), 16, MEM_CARD_WEIGHT);
+        return genSerialNumWithCheckSum(prefix.substring(0, 5) + "1" + prefix.substring(5), 20, MEM_CARD_WEIGHT);
     }
 
     /**
      * 是否可以加一位机器标识，在分布式环境中做到唯一
      */
     public static void main(String[] args) {
+        int numInsertions = 30000000;
+        BloomFilter<String> bf =
+                BloomFilter.create(
+                        Funnels.unencodedCharsFunnel(),
+                        numInsertions,
+                        0.0001);
+
+        int count = 0;
         long start = System.currentTimeMillis();
         for (int i = 0; i < 300000; i++) {
-            CardNoUtil.genCouponSn("666666");
+            String code = CardNoUtil.genCouponSn("666666");
+            if (bf.mightContain(code)) {
+                System.out.println(code + " " + bf.mightContain(code) + " " + i);
+                count++;
+            } else {
+                bf.put(code);
+            }
         }
         long end = System.currentTimeMillis();
-        System.out.println("耗时：" + (end - start) + " ms");
+        System.out.println("耗时：" + (end - start) + " ms, 重复数=" + count);
     }
 
 }
