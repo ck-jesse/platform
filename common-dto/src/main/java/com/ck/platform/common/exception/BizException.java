@@ -129,4 +129,26 @@ public class BizException extends RuntimeException implements ResultCode {
         this.msg = msg;
     }
 
+    /**
+     * 业务异常，错误码默认为1
+     *
+     * @param msg 错误描述
+     */
+    public BizException(String msg) {
+        super(msg);
+        this.code = BizResultCode.ERR_SYSTEM.getCode();
+        this.msg = msg;
+    }
+
+    /**
+     * 业务异常，错误码默认为1
+     *
+     * @param msg 错误描述
+     */
+    public BizException(String msg, Throwable cause) {
+        super(cause);
+        this.code = BizResultCode.ERR_SYSTEM.getCode();
+        this.msg = msg;
+    }
+
 }

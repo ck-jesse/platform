@@ -1,7 +1,5 @@
 package com.ck.platform.id.generator.service;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -137,7 +135,7 @@ public class SnowFlake {
     }
 
     public static void main(String[] args) throws Exception {
-        BufferedWriter out = new BufferedWriter(new FileWriter("/tmp/snowflake.log"));
+//        BufferedWriter out = new BufferedWriter(new FileWriter("/tmp/snowflake.log"));
 
         long begin = System.currentTimeMillis();
         SnowFlake snowFlake = new SnowFlake(2);
@@ -145,11 +143,11 @@ public class SnowFlake {
             Long l = snowFlake.nextId();
             String timeStr = Long.toBinaryString(l);
             System.out.println(l + " " + timeStr.length() + " " + timeStr);//            out.write(l.toString());
-            out.write(l.toString());
-            out.newLine();
+//            out.write(l.toString());
+//            out.newLine();
         }
 
-        out.close();
+//        out.close();
         long end = System.currentTimeMillis();
         System.out.println((end - begin) / 1000.0);
 //        SnowFlakeOrig snowFlakeOrig = new SnowFlakeOrig(2,3);
