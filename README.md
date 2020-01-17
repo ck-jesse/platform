@@ -25,7 +25,7 @@
 >>
 >> 2、ID分配规则如下：
 >>
->> ![1579228016776](C:\Users\Admin\AppData\Roaming\Typora\typora-user-images\1579228016776.png)
+>> ![1579228016776](img/1579228016776.png)
 >>
 >> **sign**: 符号位，也就是最高位为0；
 >>
