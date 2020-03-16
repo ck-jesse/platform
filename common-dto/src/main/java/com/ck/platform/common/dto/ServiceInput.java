@@ -16,6 +16,6 @@ public class ServiceInput implements Serializable {
     /**
      * 追踪id，可用于服务链路追踪
      */
-    private String trace_id;
+    private String traceId;
 
 }

@@ -1,5 +1,6 @@
 package com.ck.platform.common.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.ck.platform.common.exception.BizResultCode;
 import lombok.Data;
 
@@ -17,20 +18,28 @@ public class DataResult<T> extends ServiceResult {
      */
     private T data;
 
+    /**
+     * 校验是否成功
+     */
+    @JSONField(serialize = false)
+    public boolean isSucc() {
+        return BizResultCode.SUCC.getCode().equals(getCode());
+    }
+
     public DataResult() {
         super();
     }
 
-    public DataResult(String retmsg) {
-        super(retmsg);
+    public DataResult(String msg) {
+        super(msg);
     }
 
-    public DataResult(String retcode, String retmsg) {
-        super(retcode, retmsg);
+    public DataResult(String code, String msg) {
+        super(code, msg);
     }
 
-    public DataResult(T data, String retcode, String retmsg) {
-        super(retcode, retmsg);
+    public DataResult(T data, String code, String msg) {
+        super(code, msg);
         this.data = data;
     }
 
@@ -55,13 +64,22 @@ public class DataResult<T> extends ServiceResult {
         return DataResult.result(null, BizResultCode.SUCC.getCode(), BizResultCode.SUCC.getMsg());
     }
 
-    public static DataResult succ(String msg) {
-        return DataResult.result(null, BizResultCode.SUCC.getCode(), msg);
-    }
-
     public static <T> DataResult<T> succ(T data) {
         return DataResult.result(data, BizResultCode.SUCC.getCode(), BizResultCode.SUCC.getMsg());
     }
+
+    public static <T> DataResult<T> succ(T data, String msg) {
+        return DataResult.result(data, BizResultCode.SUCC.getCode(), msg);
+    }
+
+    public static <T> DataResult<T> succ(T data, String code, String msg) {
+        return DataResult.result(data, code, msg);
+    }
+
+    public static DataResult succMsg(String msg) {
+        return DataResult.result(null, BizResultCode.SUCC.getCode(), msg);
+    }
+
 
     /**
      * 设置为失败
@@ -74,7 +92,20 @@ public class DataResult<T> extends ServiceResult {
         return DataResult.result(null, BizResultCode.ERR_SYSTEM.getCode(), msg);
     }
 
-    public static <T> DataResult<T> error(T data) {
+    public static DataResult error(String code, String msg) {
+        return DataResult.result(null, code, msg);
+    }
+
+
+    public static <T> DataResult<T> error(T data, String msg) {
+        return DataResult.result(data, BizResultCode.ERR_SYSTEM.getCode(), msg);
+    }
+
+    public static <T> DataResult<T> error(T data, String code, String msg) {
+        return DataResult.result(data, code, msg);
+    }
+
+    public static <T> DataResult<T> errorData(T data) {
         return DataResult.result(data, BizResultCode.ERR_SYSTEM.getCode(), BizResultCode.ERR_SYSTEM.getMsg());
     }
 }

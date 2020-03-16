@@ -19,32 +19,33 @@ public class ServiceResult implements Serializable {
     /**
      * 返回码
      */
-    private String retcode = BizResultCode.SUCC.getCode();
+    private String code = BizResultCode.SUCC.getCode();
 
     /**
      * 描述信息
      */
-    private String retmsg = BizResultCode.SUCC.getMsg();
-
-    // 定义构造函数，方便使用
-    public ServiceResult() {
-    }
-
-    public ServiceResult(String retmsg) {
-        this.retmsg = retmsg;
-    }
-
-    public ServiceResult(String retcode, String retmsg) {
-        this.retcode = retcode;
-        this.retmsg = retmsg;
-    }
+    private String msg = BizResultCode.SUCC.getMsg();
 
     /**
      * 校验是否成功
      */
     @JSONField(serialize = false)
     public boolean isSucc() {
-        return BizResultCode.SUCC.getCode().equals(retcode);
+        return BizResultCode.SUCC.getCode().equals(getCode());
+    }
+
+    // 定义构造函数，方便使用
+
+    public ServiceResult() {
+    }
+
+    public ServiceResult(String msg) {
+        this.msg = msg;
+    }
+
+    public ServiceResult(String code, String msg) {
+        this.code = code;
+        this.msg = msg;
     }
 
     /**
@@ -66,6 +67,10 @@ public class ServiceResult implements Serializable {
         return ServiceResult.result(BizResultCode.SUCC.getCode(), msg);
     }
 
+    public static ServiceResult succ(String code, String msg) {
+        return ServiceResult.result(code, msg);
+    }
+
     /**
      * 设置为失败
      */
@@ -75,6 +80,10 @@ public class ServiceResult implements Serializable {
 
     public static ServiceResult error(String msg) {
         return ServiceResult.result(BizResultCode.ERR_SYSTEM.getCode(), msg);
+    }
+
+    public static ServiceResult error(String code, String msg) {
+        return ServiceResult.result(code, msg);
     }
 
 }

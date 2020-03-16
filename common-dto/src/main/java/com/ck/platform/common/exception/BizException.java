@@ -61,7 +61,7 @@ public class BizException extends RuntimeException implements ResultCode {
     public BizException(ResultCode resultCode, String detailMessage) {
         super(detailMessage);
         this.code = resultCode.getCode();
-        this.msg = resultCode.getMsg();
+        this.msg = detailMessage;
     }
 
     /**
@@ -74,7 +74,7 @@ public class BizException extends RuntimeException implements ResultCode {
     public BizException(ResultCode resultCode, String detailMessage, Throwable cause) {
         super(detailMessage, cause);
         this.code = resultCode.getCode();
-        this.msg = resultCode.getMsg();
+        this.msg = detailMessage;
     }
 
     /**
