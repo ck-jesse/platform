@@ -45,6 +45,7 @@ public class Tuple2<T1, T2> {
         return new Tuple2(this.t2, this.t1);
     }
 
+    @Override
     public String toString() {
         return "Tuple2{r1=" + this.t1 + ", r2=" + this.t2 + '}';
     }
