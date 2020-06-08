@@ -1,7 +1,6 @@
 package com.ck.platform.common.dto;
 
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.ck.platform.common.exception.BizResultCode;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -53,8 +52,13 @@ public class PageResult<T> implements Serializable {
     /**
      * 返回业务数据
      */
-    private List<T> dataList = new ArrayList<>();
+    private List<T> data = new ArrayList<>();
 
+    /**
+     * 附加数据
+     * 如：可以存放统计维度数据等
+     */
+    private Object attach;
 
     // 定义构造函数，方便使用
     public PageResult() {
@@ -64,8 +68,8 @@ public class PageResult<T> implements Serializable {
         this.msg = msg;
     }
 
-    public PageResult(List<T> dataList) {
-        this.dataList = dataList;
+    public PageResult(List<T> data) {
+        this.data = data;
     }
 
     public PageResult(String code, String msg) {
@@ -84,21 +88,17 @@ public class PageResult<T> implements Serializable {
     /**
      * 校验是否成功
      */
-    @JSONField(serialize = false)
     public boolean isSucc() {
-        return BizResultCode.SUCC.getCode().equals(getCode());
+        return BizResultCode.SUCC.getCode().equals(code);
     }
 
-    private static <T> PageResult<T> result(List<T> dataList, String code, String msg) {
-        // 链式调用
-        return new PageResult().setCode(code).setMsg(msg)
-                .setDataList(dataList);
+    private static <T> PageResult<T> result(List<T> data, String code, String msg) {
+        return new PageResult().setCode(code).setMsg(msg).setData(data);
     }
 
-    private static <T> PageResult<T> result(List<T> dataList, String code, String msg, Integer pageNum, Integer pageSize, Integer total) {
-        // 链式调用
+    private static <T> PageResult<T> result(List<T> data, String code, String msg, Integer pageNum, Integer pageSize, Integer total) {
         return new PageResult().setCode(code).setMsg(msg)
-                .setDataList(dataList)
+                .setData(data)
                 .setPageNum(pageNum)
                 .setPageSize(pageSize)
                 .setTotal(total);
@@ -115,24 +115,24 @@ public class PageResult<T> implements Serializable {
         return PageResult.result(null, BizResultCode.SUCC.getCode(), msg);
     }
 
-    public static <T> PageResult<T> succ(List<T> dataList) {
-        return PageResult.result(dataList, BizResultCode.SUCC.getCode(), BizResultCode.SUCC.getMsg());
+    public static <T> PageResult<T> succ(List<T> data) {
+        return PageResult.result(data, BizResultCode.SUCC.getCode(), BizResultCode.SUCC.getMsg());
     }
 
-    public static <T> PageResult<T> succ(List<T> dataList, String msg) {
-        return PageResult.result(dataList, BizResultCode.SUCC.getCode(), msg);
+    public static <T> PageResult<T> succ(List<T> data, String msg) {
+        return PageResult.result(data, BizResultCode.SUCC.getCode(), msg);
     }
 
-    public static <T> PageResult<T> succ(List<T> dataList, String code, String msg) {
-        return PageResult.result(dataList, code, msg);
+    public static <T> PageResult<T> succ(List<T> data, String code, String msg) {
+        return PageResult.result(data, code, msg);
     }
 
-    public static <T> PageResult<T> succ(List<T> dataList, Integer pageNum, Integer pageSize, Integer total) {
-        return PageResult.result(dataList, BizResultCode.SUCC.getCode(), BizResultCode.SUCC.getMsg(), pageNum, pageSize, total);
+    public static <T> PageResult<T> succ(List<T> data, Integer pageNum, Integer pageSize, Integer total) {
+        return PageResult.result(data, BizResultCode.SUCC.getCode(), BizResultCode.SUCC.getMsg(), pageNum, pageSize, total);
     }
 
-    public static <T> PageResult<T> succ(List<T> dataList, Integer pageNum, Integer pageSize, Integer total, String msg) {
-        return PageResult.result(dataList, BizResultCode.SUCC.getCode(), msg, pageNum, pageSize, total);
+    public static <T> PageResult<T> succ(List<T> data, Integer pageNum, Integer pageSize, Integer total, String msg) {
+        return PageResult.result(data, BizResultCode.SUCC.getCode(), msg, pageNum, pageSize, total);
     }
 
     /**
@@ -146,16 +146,16 @@ public class PageResult<T> implements Serializable {
         return PageResult.result(null, code, msg);
     }
 
-    public static <T> PageResult<T> error(List<T> dataList) {
-        return PageResult.result(dataList, BizResultCode.ERR_SYSTEM.getCode(), BizResultCode.ERR_SYSTEM.getMsg());
+    public static <T> PageResult<T> error(List<T> data) {
+        return PageResult.result(data, BizResultCode.ERR_SYSTEM.getCode(), BizResultCode.ERR_SYSTEM.getMsg());
     }
 
-    public static <T> PageResult<T> error(List<T> dataList, String msg) {
-        return PageResult.result(dataList, BizResultCode.ERR_SYSTEM.getCode(), msg);
+    public static <T> PageResult<T> error(List<T> data, String msg) {
+        return PageResult.result(data, BizResultCode.ERR_SYSTEM.getCode(), msg);
     }
 
-    public static <T> PageResult<T> error(List<T> dataList, String code, String msg) {
-        return PageResult.result(dataList, code, msg);
+    public static <T> PageResult<T> error(List<T> data, String code, String msg) {
+        return PageResult.result(data, code, msg);
     }
 
 }
