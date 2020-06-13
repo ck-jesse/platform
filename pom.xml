@@ -12,7 +12,6 @@
 
     <modules>
         <module>common-util</module>
-        <module>base-service</module>
         <module>common-dto</module>
     </modules>
 
