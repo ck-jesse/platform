@@ -363,7 +363,7 @@
             <!-- 要将源码放上去，需要加入这个插件 -->
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1</version>
+                <version>3.1.0</version>
                 <configuration>
                     <attach>true</attach>
                 </configuration>
