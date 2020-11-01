@@ -52,7 +52,7 @@ public class ThreadPoolSupport {
      * 获取 ThreadPoolExecutor 实例
      */
     public static ThreadPoolExecutor getPool(int corePoolSize, int maximumPoolSize, long keepAliveTimeSeconds, int queueCapacity) {
-        return ThreadPoolSupport.getPool(DEF_POOL_NAME, DEF_CORE_POOL_SIZE, DEF_MAXIMUM_POOL_SIZE, DEF_KEEPALIVE_TIME_SECONDS, DEF_QUEUE_CAPACITY);
+        return ThreadPoolSupport.getPool(DEF_POOL_NAME, corePoolSize, maximumPoolSize, keepAliveTimeSeconds, queueCapacity);
     }
 
     /**
