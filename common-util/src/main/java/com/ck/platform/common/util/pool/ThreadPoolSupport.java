@@ -71,6 +71,7 @@ public class ThreadPoolSupport {
             }
             pool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTimeSeconds, TimeUnit.SECONDS,
                     new LinkedBlockingQueue(queueCapacity), new NamedThreadFactory(poolName + "_task_"), new MyAbortPolicy(poolName));
+            POOL_MAP.put(poolName, pool);
             return pool;
         }
     }
