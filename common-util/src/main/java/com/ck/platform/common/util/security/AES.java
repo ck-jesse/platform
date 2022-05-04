@@ -124,7 +124,7 @@ public class AES {
 
         byte[] enData = encode(srcData.getBytes(), skeySpec, null);
 
-        return Base64Util.encodeString(enData, urlSafe);
+        return Base64Util.encodeBase64String(enData, urlSafe);
     }
 
     /**
@@ -218,7 +218,7 @@ public class AES {
         byte[] keyData = HexCode.decode(key);
         SecretKeySpec skeySpec = new SecretKeySpec(keyData, "AES");
 
-        byte[] enData = Base64Util.decode(srcData);
+        byte[] enData = Base64Util.decodeBase64(srcData);
 
         byte[] deData = decode(enData, skeySpec, null);
 

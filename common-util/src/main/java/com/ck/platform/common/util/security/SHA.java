@@ -33,7 +33,7 @@ public class SHA {
 
         public static String encode2base64(byte[] bytes) {
             byte[] data = digest.encode2bytes(bytes);
-            return Base64Util.encodeString(data);
+            return Base64Util.encodeBase64String(data);
         }
 
         public static String encode2base64(String data, String charset) {
@@ -43,7 +43,7 @@ public class SHA {
 
             byte[] enData = encode2bytes(data, charset);
 
-            return Base64Util.encodeString(enData);
+            return Base64Util.encodeBase64String(enData);
         }
     }
 
@@ -76,7 +76,7 @@ public class SHA {
 
         public static String encode2base64(byte[] bytes, boolean urlSafe) {
             byte[] data = digest.encode2bytes(bytes);
-            return Base64Util.encodeString(data);
+            return Base64Util.encodeBase64String(data);
         }
 
         public static String encode2base64(byte[] bytes) {
@@ -90,7 +90,7 @@ public class SHA {
 
             byte[] enData = encode2bytes(data, charset);
 
-            return Base64Util.encodeString(enData, urlSafe);
+            return Base64Util.encodeBase64String(enData, urlSafe);
         }
 
         public static String encode2base64(String data, String charset) {

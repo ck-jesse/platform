@@ -101,7 +101,7 @@ public class DES3Util {
         IvParameterSpec ips = new IvParameterSpec(KEY_IV);
         cipher.init(Cipher.ENCRYPT_MODE, deskey, ips);
         byte[] bOut = cipher.doFinal(data.getBytes(charset));
-        return new String(Base64Util.encode(bOut), charset);
+        return new String(Base64Util.encodeBase64(bOut), charset);
     }
 
     /**
@@ -143,7 +143,7 @@ public class DES3Util {
         Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
         IvParameterSpec ips = new IvParameterSpec(KEY_IV);
         cipher.init(Cipher.DECRYPT_MODE, deskey, ips);
-        byte[] bOut = cipher.doFinal(Base64Util.decode(data));
+        byte[] bOut = cipher.doFinal(Base64Util.decodeBase64(data));
         return new String(bOut, charset);
     }
 

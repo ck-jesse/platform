@@ -15,11 +15,11 @@ public class Base64Util {
      * @param data
      * @return
      */
-    public static String encodeString(String data) {
+    public static String encodeBase64String(String data) {
         if (data == null || data.length() == 0)
             return null;
 
-        return Base64Util.encodeString(data.getBytes());
+        return Base64Util.encodeBase64String(data.getBytes());
     }
 
     /**
@@ -30,11 +30,11 @@ public class Base64Util {
      * @return
      * @throws UnsupportedEncodingException
      */
-    public static String encodeString(String data, String charset) throws UnsupportedEncodingException {
+    public static String encodeBase64String(String data, String charset) throws UnsupportedEncodingException {
         if (data == null || data.length() == 0)
             return null;
 
-        return Base64Util.encodeString(data.getBytes(charset));
+        return Base64Util.encodeBase64String(data.getBytes(charset));
     }
 
     /**
@@ -44,8 +44,8 @@ public class Base64Util {
      * @param urlSafe true进行url安全处理,false不处理与encode(String data)相同
      * @return
      */
-    public static String encodeString(String data, boolean urlSafe) {
-        return Base64Util.encodeString(data.getBytes(), urlSafe);
+    public static String encodeBase64String(String data, boolean urlSafe) {
+        return Base64Util.encodeBase64String(data.getBytes(), urlSafe);
     }
 
     /**
@@ -57,9 +57,9 @@ public class Base64Util {
      * @return
      * @throws UnsupportedEncodingException
      */
-    public static String encodeString(String data, String charset, boolean urlSafe)
+    public static String encodeBase64String(String data, String charset, boolean urlSafe)
             throws UnsupportedEncodingException {
-        return Base64Util.encodeString(data.getBytes(charset), urlSafe);
+        return Base64Util.encodeBase64String(data.getBytes(charset), urlSafe);
     }
 
     /**
@@ -68,7 +68,7 @@ public class Base64Util {
      * @param bytes
      * @return
      */
-    public static String encodeString(byte[] bytes) {
+    public static String encodeBase64String(byte[] bytes) {
         if (bytes == null || bytes.length == 0)
             return null;
 
@@ -81,7 +81,7 @@ public class Base64Util {
      * @param bytes
      * @return
      */
-    public static byte[] encode(byte[] bytes) {
+    public static byte[] encodeBase64(byte[] bytes) {
         if (bytes == null || bytes.length == 0)
             return null;
 
@@ -95,7 +95,7 @@ public class Base64Util {
      * @param urlSafe url safe模式,字符+和/分别变成-和_
      * @return
      */
-    public static String encodeString(byte[] bytes, boolean urlSafe) {
+    public static String encodeBase64String(byte[] bytes, boolean urlSafe) {
         if (bytes == null || bytes.length == 0)
             return null;
 
@@ -112,7 +112,7 @@ public class Base64Util {
      * @param data
      * @return
      */
-    public static byte[] decode(String data) {
+    public static byte[] decodeBase64(String data) {
         if (data == null || data.length() == 0)
             return null;
 
@@ -125,8 +125,8 @@ public class Base64Util {
      * @param data
      * @return
      */
-    public static String decodeString(String data) {
-        byte[] deData = decode(data);
+    public static String decodeBase64String(String data) {
+        byte[] deData = decodeBase64(data);
 
         if (deData == null)
             return null;
@@ -142,9 +142,9 @@ public class Base64Util {
      * @return
      * @throws UnsupportedEncodingException
      */
-    public static String decodeString(String data, String decodeCharset)
+    public static String decodeBase64String(String data, String decodeCharset)
             throws UnsupportedEncodingException {
-        byte[] deData = decode(data);
+        byte[] deData = decodeBase64(data);
 
         if (deData == null)
             return null;

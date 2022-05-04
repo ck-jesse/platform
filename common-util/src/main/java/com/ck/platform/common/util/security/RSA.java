@@ -4,12 +4,6 @@ import com.ck.platform.common.util.security.Tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Cipher;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -18,19 +12,26 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
-import java.security.interfaces.RSAKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 public class RSA {
     private static final Logger logger = LoggerFactory.getLogger(RSA.class);
 
-    public static final int PUBLIC_KEY = 1;
-    public static final int PRIVATE_KEY = 2;
+    /**
+     * 加密算法 RSA
+     */
+    protected static String ALGORITHM_RSA = "RSA";
 
-    protected static String DEFAULT_RSA_ALG = "RSA/ECB/PKCS1Padding";
+    /**
+     * 签名验签算法 SHA1
+     */
+    protected static String SIGN_ALGORITHM_SHA1 = "SHA1WithRSA";
 
-    protected static String DEFAULT_RSA_MODE_PADD = "ECB/PKCS1Padding";
+    /**
+     * 签名验签算法 SHA256
+     */
+    protected static String SIGN_ALGORITHM_SHA256 = "SHA256WithRSA";
 
     /**
      * RSA最大加密明文大小
@@ -42,8 +43,10 @@ public class RSA {
      */
     protected static final int MAX_DECRYPT_BLOCK = 128;
 
+    // ============= 1. 生成RSA公私钥
+
     /**
-     * 生成rsa公私钥
+     * 生成RSA公私钥
      *
      * @param keyRandom 随机串
      * @param keySize   密钥长度
@@ -51,20 +54,19 @@ public class RSA {
      */
     public static Tuple2<PublicKey, PrivateKey> genKeyPair(String keyRandom, int keySize) {
         try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITHM_RSA);
 
             generator.initialize(keySize, new SecureRandom(keyRandom.getBytes()));
-            KeyPair pair = generator.generateKeyPair();
-            PublicKey pubKey = pair.getPublic();
-            PrivateKey privKey = pair.getPrivate();
+            KeyPair keyPair = generator.generateKeyPair();
+            PublicKey publicKey = keyPair.getPublic();
+            PrivateKey privateKey = keyPair.getPrivate();
 
-            return new Tuple2<PublicKey, PrivateKey>(pubKey, privKey);
+            return new Tuple2<PublicKey, PrivateKey>(publicKey, privateKey);
         } catch (NoSuchAlgorithmException e) {
             logger.error("not support RSA", e);
         } catch (Throwable t) {
             logger.error("generate RSA key fail", t);
         }
-
         return null;
     }
 
@@ -75,421 +77,245 @@ public class RSA {
      * @param keySize
      * @return 返回的_1()是公钥，_2()是私钥
      */
-    public static Tuple2<String, String> genKeyStrPair(String keyRandom, int keySize) {
+    public static Tuple2<String, String> genKeyPairStr(String keyRandom, int keySize) {
         Tuple2<PublicKey, PrivateKey> keyPair = genKeyPair(keyRandom, keySize);
-        if (keyPair == null)
+        if (keyPair == null) {
             return null;
+        }
 
-        String pubStrKey = Base64Util.encodeString(keyPair._1().getEncoded());
-        String privStrKey = Base64Util.encodeString(keyPair._2().getEncoded());
+        // base64 编码
+        String publicKeyStr = Base64Util.encodeBase64String(keyPair._1().getEncoded());
+        String privateKeyStr = Base64Util.encodeBase64String(keyPair._2().getEncoded());
 
-        return new Tuple2<String, String>(pubStrKey, privStrKey);
+        return new Tuple2<String, String>(publicKeyStr, privateKeyStr);
     }
 
+    // ============= 2. 提取密钥对象
+
     /**
-     * 从编码好的公钥串产生公钥KEY对象
+     * 根据公钥串生成公钥KEY对象
      *
-     * @param key
+     * @param publicKeyStr
      * @return
      * @throws Exception
      */
-    public static PublicKey getPublicKey(String key) {
+    public static PublicKey getPublicKey(String publicKeyStr) {
         try {
-            byte[] keyBytes = Base64Util.decode(key);
+            // base64 解码
+            byte[] keyBytes = Base64Util.decodeBase64(publicKeyStr);
 
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
+            KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM_RSA);
             PublicKey publicKey = keyFactory.generatePublic(keySpec);
-
             return publicKey;
-
         } catch (Exception e) {
             logger.error("RSA getPublicKey fail", e);
         }
-
         return null;
     }
 
     /**
-     * 从编码好的私钥串产生私钥KEY对象
+     * 根据私钥串生成私钥KEY对象
      *
-     * @param key
+     * @param privateKeyStr
      * @return
      * @throws Exception
      */
-    public static PrivateKey getPrivateKey(String key) {
+    public static PrivateKey getPrivateKey(String privateKeyStr) {
         try {
-            byte[] keyBytes = Base64Util.decode(key);
+            // base64 解码
+            byte[] keyBytes = Base64Util.decodeBase64(privateKeyStr);
 
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM_RSA);
             PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
             return privateKey;
-
         } catch (Exception e) {
             logger.error("RSA getPrivateKey fail", e);
         }
-
         return null;
     }
 
-    /**
-     * 验证RSA签名
-     *
-     * @param text
-     * @param sign
-     * @param key
-     * @return
-     */
-    public static boolean verifyBySHA1(String text, String sign, String key) {
-        try {
-            Signature signatureChecker = Signature.getInstance("SHA1WithRSA");
-            PublicKey pubKey = getPublicKey(key);
-            signatureChecker.initVerify(pubKey);
-            signatureChecker.update(text.getBytes());
-            // 验证签名是否正常
-            byte[] signBytes = Base64Util.decode(sign);
-
-            if (signatureChecker.verify(signBytes))
-                return true;
-
-            return false;
-        } catch (Throwable t) {
-            logger.error("verifyBySHA1 fail", t);
-        }
-
-        return false;
-    }
-
-    /**
-     * 验证RSA签名
-     *
-     * @param text
-     * @param sign
-     * @param key
-     * @return
-     */
-    public static boolean verifyBySHA1(String text, String charset, String sign, String key) {
-        try {
-            Signature signatureChecker = Signature.getInstance("SHA1WithRSA");
-            PublicKey pubKey = getPublicKey(key);
-            signatureChecker.initVerify(pubKey);
-            signatureChecker.update(text.getBytes(charset));
-            // 验证签名是否正常
-            byte[] signBytes = Base64Util.decode(sign);
-
-            if (signatureChecker.verify(signBytes))
-                return true;
-
-            return false;
-        } catch (Throwable t) {
-            logger.error("verifyBySHA1 fail", t);
-        }
-
-        return false;
-    }
+    // ============= 3. 签名
 
     /**
      * 生成RSA签名
      *
-     * @param text
-     * @param key
+     * @param signAlgorithm 签名算法
+     * @param privateKeyStr 私钥
+     * @param data          待签名数据
+     * @param charset       字符集
      * @return
      */
-    public static byte[] genByteSignWithSHA1(String text, String key) {
+    public static byte[] genSign(String signAlgorithm, String privateKeyStr, String data, String charset) {
         try {
-            Signature signatureChecker = Signature.getInstance("SHA1WithRSA");
-            PrivateKey privKey = getPrivateKey(key);
-            signatureChecker.initSign(privKey);
-            signatureChecker.update(text.getBytes());
-
-            return signatureChecker.sign();
-
+            Signature signature = Signature.getInstance(signAlgorithm);
+            PrivateKey privateKey = getPrivateKey(privateKeyStr);
+            signature.initSign(privateKey);
+            if (null == charset || "".equals(charset.trim())) {
+                signature.update(data.getBytes());
+            } else {
+                signature.update(data.getBytes(charset));
+            }
+            return signature.sign();
         } catch (Throwable e) {
-            logger.error("genByteSignWithSHA1 fail", e);
+            logger.error("生成RSA签名 fail, signAlgorithm=" + signAlgorithm, e);
         }
-
-        return null;
-    }
-
-    public static byte[] genByteSignWithSHA1(String text, String charset, String key) {
-        try {
-            Signature signatureChecker = Signature.getInstance("SHA1WithRSA");
-            PrivateKey privKey = getPrivateKey(key);
-            signatureChecker.initSign(privKey);
-            signatureChecker.update(text.getBytes(charset));
-
-            return signatureChecker.sign();
-
-        } catch (Throwable e) {
-            logger.error("genByteSignWithSHA1 fail", e);
-        }
-
         return null;
     }
 
     /**
      * 生成RSA签名
      *
-     * @param text
-     * @param charset
-     * @param key
+     * @param signAlgorithm 签名算法
+     * @param privateKeyStr 私钥
+     * @param data          待签名数据
+     * @param charset       字符集
+     * @param urlSafe       url safe模式,字符+和/分别变成-和_
      * @return
      */
-    public static String genSignWithSHA1(String text, String charset, String key) {
-        return RSA.genSignWithSHA1(text, charset, key, false);
-    }
-
-    public static String genSignWithSHA1(String text, String charset, String key, boolean urlSafe) {
-        byte[] signData = genByteSignWithSHA1(text, charset, key);
+    public static String genSign(String signAlgorithm, String privateKeyStr, String data, String charset, boolean urlSafe) {
+        byte[] signData = RSA.genSign(signAlgorithm, privateKeyStr, data, charset);
         if (signData == null || signData.length == 0)
             return null;
 
-        return Base64Util.encodeString(signData, urlSafe);
-    }
-
-    public static String genSignWithSHA1(String text, String key) {
-        return RSA.genSignWithSHA1(text, key, false);
-    }
-
-    public static String genSignWithSHA1(String text, String key, boolean urlSafe) {
-        byte[] signData = genByteSignWithSHA1(text, key);
-        if (signData == null || signData.length == 0)
-            return null;
-
-        return Base64Util.encodeString(signData, urlSafe);
+        return Base64Util.encodeBase64String(signData, urlSafe);
     }
 
     /**
-     * RSA加密
+     * 生成RSA签名（SHA1WithRSA）
      *
-     * @param ins
-     * @param outs
-     * @param key
-     * @param modePadding
-     * @return true-成功，false-失败
+     * @param privateKeyStr 私钥
+     * @param data          待签名数据
+     * @param charset       字符集
+     * @param urlSafe       url safe模式,字符+和/分别变成-和_
+     * @return
      */
-    public static boolean encode(InputStream ins, OutputStream outs, Key key, String modePadding) {
+    public static String genSignWithSHA1(String privateKeyStr, String data, String charset, boolean urlSafe) {
+        return RSA.genSign(SIGN_ALGORITHM_SHA1, privateKeyStr, data, charset, urlSafe);
+    }
+
+    public static String genSignWithSHA1(String privateKeyStr, String data) {
+        return RSA.genSign(SIGN_ALGORITHM_SHA1, privateKeyStr, data, null, true);
+    }
+
+    /**
+     * 生成RSA签名（SHA256WithRSA）
+     *
+     * @param privateKeyStr 私钥
+     * @param data          待签名数据
+     * @param charset       字符集
+     * @param urlSafe       url safe模式,字符+和/分别变成-和_
+     * @return
+     */
+    public static String genSignWithSHA256(String privateKeyStr, String data, String charset, boolean urlSafe) {
+        return RSA.genSign(SIGN_ALGORITHM_SHA256, privateKeyStr, data, charset, urlSafe);
+    }
+
+    public static String genSignWithSHA256(String privateKeyStr, String data) {
+        return RSA.genSign(SIGN_ALGORITHM_SHA256, privateKeyStr, data, null, true);
+    }
+
+    // ============= 4. 验签
+
+
+    /**
+     * 验证RSA签名
+     *
+     * @param signAlgorithm 签名算法
+     * @param publicKeyStr  公钥
+     * @param data          待签名数据
+     * @param charset       字符集
+     * @param sign          签名
+     * @return
+     */
+    public static boolean verifySign(String signAlgorithm, String publicKeyStr, String sign, String data, String charset) {
         try {
-            Cipher cipher = null;
-            if (modePadding == null)
-                cipher = Cipher.getInstance(DEFAULT_RSA_ALG);
-            else if (modePadding.startsWith("RSA/")) {
-                cipher = Cipher.getInstance(modePadding);
+            Signature signatureChecker = Signature.getInstance(signAlgorithm);
+            PublicKey publicKey = getPublicKey(publicKeyStr);
+            signatureChecker.initVerify(publicKey);
+
+            if (null == charset || "".equals(charset.trim())) {
+                signatureChecker.update(data.getBytes());
             } else {
-                cipher = Cipher.getInstance("RSA/" + modePadding);
+                signatureChecker.update(data.getBytes(charset));
             }
 
-            RSAKey rsaKey = (RSAKey) key;
-            int keyBitlen = rsaKey.getModulus().bitLength();
-            logger.debug("RSA endocde key length:", keyBitlen);
-            int max_block_size = keyBitlen / 8 - 11;
+            // 验证签名是否正常
+            byte[] signBytes = Base64Util.decodeBase64(sign);
 
-            // encrypt the plain text using the public key
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-            int readSize = 0;
-            byte[] buffer = new byte[max_block_size];
-            //每次读取117个字符，循环读取
-            while ((readSize = ins.read(buffer)) > 0) {
-                byte[] enData = cipher.doFinal(buffer, 0, readSize);
-                outs.write(enData);
+            if (signatureChecker.verify(signBytes)) {
+                return true;
             }
-
-            return true;
-
-        } catch (Throwable e) {
-            logger.error("RSA encode fail", e);
+        } catch (Throwable t) {
+            logger.error("验证RSA签名 fail, signAlgorithm=" + signAlgorithm, t);
         }
-
         return false;
     }
 
+
     /**
-     * RSA加密
+     * 验证RSA签名（SHA1WithRSA）
      *
-     * @param srcData
-     * @param key
-     * @param modePadding
+     * @param publicKeyStr 公钥
+     * @param data         待签名数据
+     * @param charset      字符集
+     * @param sign         签名
      * @return
      */
-    public static byte[] encode(byte[] srcData, Key key, String modePadding) {
-        InputStream in = new ByteArrayInputStream(srcData);
-        int srcLen = srcData.length;
-
-        RSAKey rsaKey = (RSAKey) key;
-        int keyBitlen = rsaKey.getModulus().bitLength();
-        logger.debug("RSA endocde key length:", keyBitlen);
-        int max_block_size = keyBitlen / 8 - 11;
-
-        //计算加密后的需要保存数据的长度
-        int outLen = ((srcLen + max_block_size - 1) / max_block_size) * (keyBitlen / 8);
-        ByteArrayOutputStream out = new ByteArrayOutputStream(outLen);
-        boolean result = encode(in, out, key, modePadding);
-        if (!result)
-            return null;
-
-        return out.toByteArray();
+    public static boolean verifySignBySHA1(String publicKeyStr, String sign, String data, String charset) {
+        return RSA.verifySign(SIGN_ALGORITHM_SHA1, publicKeyStr, sign, data, charset);
     }
 
-    public static byte[] encode(byte[] srcData, Key key) {
-        return encode(srcData, key, null);
-    }
-
-    public static byte[] encode(byte[] srcData, String key, int keyType) {
-        Key encodeKey = null;
-        if (keyType == RSA.PRIVATE_KEY)
-            encodeKey = getPrivateKey(key);
-        else
-            encodeKey = getPublicKey(key);
-
-        return encode(srcData, encodeKey);
-    }
-
-    public static String encode(String srcData, String key, int keyType, boolean urlSafe) {
-        byte[] data = encode(srcData.getBytes(), key, keyType);
-
-        return Base64Util.encodeString(data, urlSafe);
-    }
-
-    public static String encode(String srcData, String key, int keyType) {
-        return encode(srcData, key, keyType, false);
+    public static boolean verifySignBySHA1(String publicKeyStr, String sign, String data) {
+        return RSA.verifySign(SIGN_ALGORITHM_SHA1, publicKeyStr, sign, data, null);
     }
 
     /**
-     * RSA加密，公钥加密
+     * 验证RSA签名（SHA256WithRSA）
      *
-     * @param srcData
-     * @param key     公钥
+     * @param publicKeyStr 公钥
+     * @param data         待签名数据
+     * @param charset      字符集
+     * @param sign         签名
      * @return
      */
-    public static String encode(String srcData, String key) {
-        return encode(srcData, key, RSA.PUBLIC_KEY);
+    public static boolean verifySignBySHA256(String publicKeyStr, String sign, String data, String charset) {
+        return RSA.verifySign(SIGN_ALGORITHM_SHA256, publicKeyStr, sign, data, charset);
     }
 
-    public static String encode(String srcData, String key, boolean urlSafe) {
-        return encode(srcData, key, RSA.PUBLIC_KEY, urlSafe);
+    public static boolean verifySignBySHA256(String publicKeyStr, String sign, String data) {
+        return RSA.verifySign(SIGN_ALGORITHM_SHA256, publicKeyStr, sign, data, null);
     }
 
-    /**
-     * RSA解密
-     *
-     * @param ins
-     * @param outs
-     * @param key
-     * @param modePadding
-     * @return true-成功,false-失败
-     */
-    public static boolean decode(InputStream ins, OutputStream outs, Key key, String modePadding) {
-        try {
-            Cipher cipher = null;
-            if (modePadding == null)
-                cipher = Cipher.getInstance(DEFAULT_RSA_ALG);
-            else if (modePadding.startsWith("RSA/")) {
-                cipher = Cipher.getInstance(modePadding);
-            } else {
-                cipher = Cipher.getInstance("RSA/" + modePadding);
-            }
-
-            //计算key长度
-            RSAKey rsaKey = (RSAKey) key;
-            int keyBitlen = rsaKey.getModulus().bitLength();
-            logger.debug("RSA decode key length:", keyBitlen);
-            int max_block_size = keyBitlen / 8;
-
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            int readSize = 0;
-            byte[] buffer = new byte[max_block_size];
-            //每次读取128个字符，循环读取
-            while ((readSize = ins.read(buffer)) > 0) {
-                byte[] deData = cipher.doFinal(buffer, 0, readSize);
-                outs.write(deData);
-            }
-
-            return true;
-        } catch (Throwable e) {
-            logger.error("RSA decode fail", e);
-        }
-
-        return false;
-    }
-
-    /**
-     * RSA解密
-     *
-     * @param enData
-     * @param key
-     * @param modePadding
-     * @return
-     */
-    public static byte[] decode(byte[] enData, Key key, String modePadding) {
-        InputStream in = new ByteArrayInputStream(enData);
-        int len = enData.length;
-        //解密后的数据长度不超过密文长度
-        ByteArrayOutputStream out = new ByteArrayOutputStream(len);
-        boolean result = decode(in, out, key, modePadding);
-        if (!result)
-            return null;
-
-        return out.toByteArray();
-    }
-
-    public static byte[] decode(byte[] enData, Key key) {
-        return decode(enData, key, null);
-    }
-
-    public static byte[] decode(byte[] enData, String key, int keyType) {
-        Key decodeKey = null;
-        if (keyType == RSA.PUBLIC_KEY)
-            decodeKey = getPublicKey(key);
-        else
-            decodeKey = getPrivateKey(key);
-
-        return decode(enData, decodeKey);
-    }
-
-    public static String decode(String enData, String key, int keyType) {
-        byte[] inData = Base64Util.decode(enData);
-        byte[] data = decode(inData, key, keyType);
-
-        return new String(data);
-    }
-
-    /**
-     * RSA解密，私钥解密
-     *
-     * @param enData
-     * @param key
-     * @return
-     */
-    public static String decode(String enData, String key) {
-        return decode(enData, key, RSA.PRIVATE_KEY);
-    }
 
     public static void main(String[] args) {
-        try {
 
-            Tuple2<String, String> keys = genKeyStrPair("1234", 1024);
-            System.out.println(keys._1());
-            System.out.println(Base64Util.formatBase64Str(keys._2()));
-            System.out.println(Base64Util.formatBase64Str(keys._2()));
+        Tuple2<String, String> keys = RSA.genKeyPairStr("1234", 1024);
+        System.out.println("公钥");
+        System.out.println(Base64Util.formatBase64Str(keys._2()));
+        System.out.println("私钥");
+        System.out.println(Base64Util.formatBase64Str(keys._2()));
 
-            String srcText = "123wsdfQwehPE8ynEwZkHm0XRi80sMQnNJ85wnVqssuV+jAWnR565glvy2ks9aLz6TZAkA5KZ+1axquBMlmKpUaQFv7LXipfkVWF16h4QeWGA/h9xreRcAnt5rbwk2JFD0DupQeZelEWrHxxvaAWBkFhSsFAkBcwTiApqV+I6nAWKv16llzaIvKDqn7hPpXVNM7iV/VipM/zETXeJMvBSHJAm2OdD5eL6UlQ7WttaIS";
-            String sign = genSignWithSHA1(srcText, keys._2());
-            System.out.println(sign);
+        String data = "123wsdfQwehPE8ynEwZkHm0XRi80sMQnNJ85wnVqssuV+jAWnR565glvy2ks9aLz6TZAkA5KZ+1axquBMlmKpUaQFv7LXipfkVWF16h4QeWGA/h9xreRcAnt5rbwk2JFD0DupQeZelEWrHxxvaAWBkFhSsFAkBcwTiApqV+I6nAWKv16llzaIvKDqn7hPpXVNM7iV/VipM/zETXeJMvBSHJAm2OdD5eL6UlQ7WttaIS";
+        data = "123465798";
 
-            System.out.println(verifyBySHA1(srcText, "12" + sign.substring(2), keys._1()));
+        System.out.println();
+        String signSHA1 = RSA.genSignWithSHA1(keys._2(), data);
+        System.out.println("SHA1签名 = " + signSHA1);
 
-            String srcData = "123wsdfQwehPE8ynEwZkHm0XRi80sMQnNJ85wnVqssuV+jAWnR565glvy2ks9aLz6TZAkA5KZ+1axquBMlmKpUaQFv7LXipfkVWF16h4QeWGA/h9xreRcAnt5rbwk2JFD0DupQeZelEWrHxxvaAWBkFhSsFAkBcwTiApqV+I6nAWKv16llzaIvKDqn7hPpXVNM7iV/VipM/zETXeJMvBSHJAm2OdD5eL6UlQ7WttaIS" +
-                    "LAcGGQKBgF1CZT+Lsf2aLRsD8f/w5yp9/fSlDDmX/F4eFO+qUQUa1S+CrGh4/KiB7PGDeiffnE0y" +
-                    "BfMmrHDWZALhLUn1PNoX6iW8QCf+Fq9SrUzGJarYcVyNPr6ATuhQuWGr++qHj3+fys8r+04vEIHO";
-            //String srcData = "12312";
-            String enData = RSA.encode(srcData, keys._1());
-            System.out.println(enData);
-            String deData = RSA.decode(enData, keys._2());
-            System.out.println(deData);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        boolean checkSHA1 = RSA.verifySignBySHA1(keys._1(), signSHA1, data);
+        System.out.println("SHA1验签 = " + checkSHA1);
+
+        System.out.println();
+        String signSHA256 = RSA.genSignWithSHA256(keys._2(), data);
+        System.out.println("SHA256签名 = " + signSHA256);
+
+        boolean checkSHA256 = RSA.verifySignBySHA256(keys._1(), signSHA256, data);
+        System.out.println("SHA256验签 = " + checkSHA256);
+
+
+
+
     }
 }
