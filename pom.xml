@@ -72,7 +72,7 @@
 
         <!-- 其他常用工具包 -->
         <guava.version>24.1.1</guava.version>
-        <fastjson.version>1.2.36</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <lombok.version>1.18.4</lombok.version>
         <slf4j.version>1.7.25</slf4j.version>
         <junit.version>4.12</junit.version>
