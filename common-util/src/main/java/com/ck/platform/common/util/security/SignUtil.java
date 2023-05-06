@@ -31,37 +31,30 @@ public class SignUtil {
      * @param key       秘钥
      * @return
      */
-    public static boolean checkSign(String signData, String charset, String sign_type, String sign,
-                                    String key) {
-        String type = sign_type;
+    public static boolean checkSign(String signData, String charset, String sign_type, String sign, String key) {
         boolean checkResult = false;
         String calcSign = "";
-        if (ST_MD5.equalsIgnoreCase(type)) {
+        if (ST_MD5.equalsIgnoreCase(sign_type)) {
+            // MD5 算法
             calcSign = MD5.encode(signData + "&key=" + key, charset);
             checkResult = sign.equalsIgnoreCase(calcSign);
-        } else if (ST_RSA.equalsIgnoreCase(type)) {
+        } else if (ST_RSA.equalsIgnoreCase(sign_type)) {
             // SHA1WithRSA 算法
-            checkResult = RSA.verifyBySHA1(signData, charset, sign, key);
-        } else if (ST_RSA_SHA256.equalsIgnoreCase(type) || ST_RSA2.equalsIgnoreCase(type)) {
+            checkResult = RSA.verifySignBySHA1(key, sign, signData, charset);
+        } else if (ST_RSA_SHA256.equalsIgnoreCase(sign_type) || ST_RSA2.equalsIgnoreCase(sign_type)) {
             // SHA256WithRSA 算法
-            try {
-                checkResult = RSAUtils.verifySign(RSAUtils.SignatureSuite.SHA256, signData.getBytes(charset), Base64Util.decode(sign), key);
-            } catch (UnsupportedEncodingException e) {
-                logger.error("checkSign error:{}", e.getMessage());
-            }
-        } else if (ST_SHA1.equalsIgnoreCase(type)) {
+            checkResult = RSA.verifySignBySHA256(key, sign, signData, charset);
+        } else if (ST_SHA1.equalsIgnoreCase(sign_type)) {
+            // SHA1 算法
             calcSign = SHA.SHA1.encode(signData + "&key=" + key, charset);
             checkResult = sign.equalsIgnoreCase(calcSign);
-
-        } else if (ST_SHA256.equalsIgnoreCase(type)) {
+        } else if (ST_SHA256.equalsIgnoreCase(sign_type)) {
+            // SHA256 算法
             // 由于encode采用的16进制，会导致签名串过长，替换为base64可减少签名串的长度
-            // calcSign = SHA256.encode(signData + "&key=" + key, charset);
             calcSign = SHA.SHA256.encode2base64(signData + "&key=" + key, charset);
-            // logger.info("checkSign：" + signData + "&key=" + key);
-            // logger.info("checkSign：calcSign=" + calcSign);
             checkResult = sign.equalsIgnoreCase(calcSign);
         } else {
-            logger.error("invalid sign type:{}", type);
+            logger.error("invalid sign sign_type:{}", sign_type);
         }
 
         if (!checkResult) {
@@ -80,31 +73,25 @@ public class SignUtil {
      * @return
      */
     public static String genSign(String signData, String charset, String sign_type, String key) {
-        String type = sign_type;
         String signResult = null;
-        if (ST_MD5.equalsIgnoreCase(type)) {
+        if (ST_MD5.equalsIgnoreCase(sign_type)) {
+            // MD5 算法
             signResult = MD5.encode(signData + "&key=" + key, charset);
-        } else if (ST_RSA.equalsIgnoreCase(type)) {
+        } else if (ST_RSA.equalsIgnoreCase(sign_type)) {
             // SHA1WithRSA 算法
-            signResult = RSA.genSignWithSHA1(signData, charset, key, true);
-        } else if (ST_RSA_SHA256.equalsIgnoreCase(type) || ST_RSA2.equalsIgnoreCase(type)) {
+            signResult = RSA.genSignWithSHA1(key, signData, charset, true);
+        } else if (ST_RSA_SHA256.equalsIgnoreCase(sign_type) || ST_RSA2.equalsIgnoreCase(sign_type)) {
             // SHA256WithRSA 算法
-            try {
-                byte[] signBuf = RSAUtils.sign(RSAUtils.SignatureSuite.SHA256, signData.getBytes(charset), key);
-                return new String(Base64Util.encodeString(signBuf, true));
-            } catch (UnsupportedEncodingException e) {
-                logger.error("genSign error:{}", e.getMessage());
-            }
-        } else if (ST_SHA1.equalsIgnoreCase(type)) {
+            signResult = RSA.genSignWithSHA256(key, signData, charset, true);
+        } else if (ST_SHA1.equalsIgnoreCase(sign_type)) {
+            // SHA1 算法
             signResult = SHA.SHA1.encode(signData + "&key=" + key, charset);
-        } else if (ST_SHA256.equalsIgnoreCase(type)) {
+        } else if (ST_SHA256.equalsIgnoreCase(sign_type)) {
+            // SHA256 算法
             // 由于encode采用的16进制，会导致签名串过长，替换为base64可减少签名串的长度
-            // signResult = SHA256.encode(signData + "&key=" + key, charset);
             signResult = SHA.SHA256.encode2base64(signData + "&key=" + key, charset);
-            // logger.info("genSign：" + signData + "&key=" + key);
-            // logger.info("genSign：signResult=" + signResult);
         } else {
-            logger.error("invalid sign type:{}", type);
+            logger.error("invalid sign sign_type:{}", sign_type);
         }
 
         return signResult;
@@ -118,7 +105,7 @@ public class SignUtil {
      * @param input 待签名对象 自定义对象或JSON格式字符串
      * @return
      */
-    public static String calcSingData(Object input) {
+    public static String calcSignData(Object input) {
         if (input == null) {
             return null;
         }
