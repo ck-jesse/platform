@@ -67,11 +67,11 @@
 
         <!-- apache工具包 -->
         <commons.lang3.version>3.3.2</commons.lang3.version>
-        <commons.beanutils.version>1.8.3</commons.beanutils.version>
+        <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons-codec.version>1.9</commons-codec.version>
 
         <!-- 其他常用工具包 -->
-        <guava.version>20.0</guava.version>
+        <guava.version>24.1.1</guava.version>
         <fastjson.version>1.2.36</fastjson.version>
         <lombok.version>1.18.4</lombok.version>
         <slf4j.version>1.7.25</slf4j.version>
