@@ -40,7 +40,7 @@ public class MdcForkJoinPool extends ForkJoinPool {
      * Returns the next sequence number. We don't expect this to
      * ever contend, so use simple builtin sync.
      */
-    private static final synchronized int nextPoolId() {
+    private static synchronized int nextPoolId() {
         return ++poolNumberSequence;
     }
 
@@ -67,8 +67,12 @@ public class MdcForkJoinPool extends ForkJoinPool {
         this(DEFAULT_PARALLELISM, threadNamePrefix);
     }
 
+    /**
+     * @param parallelism      the parallelism level. For default value, use {@link Runtime#availableProcessors}.
+     * @param threadNamePrefix 自定义的线程名称前缀
+     */
     public MdcForkJoinPool(int parallelism, String threadNamePrefix) {
-        this(parallelism, new LimitedThreadForkJoinWorkerThreadFactory(parallelism, threadNamePrefix + "-" + nextPoolId()), null, false);
+        this(parallelism, new CustomForkJoinWorkerThreadFactory(threadNamePrefix + "-" + nextPoolId()), null, false);
     }
 
     /**
